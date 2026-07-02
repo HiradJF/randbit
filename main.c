@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+
 
 uint32_t random_u32(){
 
@@ -28,5 +30,8 @@ uint32_t rand_int;
 BCryptGenRandom(NULL, (PUCHAR)&rand_int, sizeof(rand_int), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 
 #endif
+}
 
+bool rand_bit(){
+    return random_u32() & 1;
 }
