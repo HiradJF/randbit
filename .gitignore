@@ -1,4 +1,7 @@
+a.out
 main
 *.o
+*.so
+*.exe
 randbit
 build/
