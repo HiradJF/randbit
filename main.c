@@ -5,10 +5,10 @@
 #include <string.h>
 
 //          RETURN CODES            //
-#define EXIT_TOO_MUCH_ARGS (1)
-#define EXIT_TOO_FEW_ARGS (2)
-#define EXIT_INVALID_ARGS (3)
-#define EXIT_GEN_ERR (4)
+#define EXIT_TOO_MUCH_ARGS 1
+#define EXIT_TOO_FEW_ARGS 2
+#define EXIT_INVALID_ARGS 3
+#define EXIT_GEN_ERR 4
 //                                  //
 
 
@@ -59,7 +59,9 @@ static inline bool in_modes(const char *mode){
             streq(mode, "--bool") || streq(mode, "-b")||
             streq(mode, "--coin") || streq(mode, "-c") ||
             streq(mode, "--int") || streq(mode, "-i") ||
-            streq(mode, "--bitstream") || streq(mode, "-s");      
+            streq(mode, "--uint") || streq(mode, "-u") ||
+            streq(mode, "--bitstream") || streq(mode, "-s") ||
+            streq(mode, "--label") || streq(mode, "-l");      
 }
 
 static inline void print_help(const char *program_exec) {
@@ -67,13 +69,14 @@ static inline void print_help(const char *program_exec) {
 
     puts(
         "Modes:\n"
-        "Default (no mode): outputs a random bit (0 or 1)\n"
+        "Default (no mode):      outputs a random bit (0 or 1)\n"
         "--help, -h              Show this help message\n"
         "--version, -v           Show version\n"
         "--bool, -b              Output bit as true/false\n"
         "--coin, -c              Output bit as heads/tails\n"
-        "--int, -i               Output unsigned 32-bit integer\n"
-        "--bitstream, -s       Output 32-bit value as bit stream\n"
+        "--int, -i               Output signed 32-bit integer\n"
+        "--uint,-u               Output unsigned 32-bit integer\n"
+        "--bitstream, -s         Output 32-bit value as bit stream\n"
         "--label, -l [0] [1]     Custom labels for 0 and 1\n"
     );
 }
@@ -101,15 +104,15 @@ int main(int argc, char **argv){
     #define ARG_ERR(EXIT_CODE)\
     switch (EXIT_CODE){\
         case EXIT_TOO_MUCH_ARGS:\
-            fprintf(stderr, "Too many arguments for mode: \"%s\"", argv[1]);\
+            fprintf(stderr, "Too many arguments for mode: \"%s\"\n", argv[1]);\
             print_help(argv[0]);\
             return EXIT_TOO_MUCH_ARGS;\
         case EXIT_TOO_FEW_ARGS:\
-            fprintf(stderr, "Too few arguments for mode: \"%s\"", argv[1]);\
+            fprintf(stderr, "Too few arguments for mode: \"%s\"\n", argv[1]);\
             print_help(argv[0]);\
             return EXIT_TOO_FEW_ARGS;\
         case EXIT_INVALID_ARGS:\
-            fprintf(stderr, "Invalid mode: \"%s\"", argv[1]);\
+            fprintf(stderr, "Invalid mode: \"%s\"\n", argv[1]);\
             print_help(argv[0]);\
             return EXIT_TOO_FEW_ARGS;\
     }
@@ -126,6 +129,10 @@ int main(int argc, char **argv){
 
     // if only 1 arg (excluding argv[0]) passed. Example: ./randbit --help
     case 2:
+        if(!in_modes(argv[1]))
+        {
+            ARG_ERR(EXIT_INVALID_ARGS)
+        }
         if (streq(argv[1], "--help") || streq(argv[1], "-h"))
         {
             print_help(argv[0]);
@@ -148,20 +155,24 @@ int main(int argc, char **argv){
         }
         if (streq(argv[1], "--int") || streq(argv[1], "-i"))
         {
-            printf("%d", random_u32());
+            printf("%d\n", random_u32());
+            return EXIT_SUCCESS;
+        }
+        if (streq(argv[1], "--uint") || streq(argv[1], "-u"))
+        {
+            printf("%u\n", random_u32());
             return EXIT_SUCCESS;
         }
         if (streq(argv[1], "--bitstream") || streq(argv[1], "-s"))
         {
             char stream[33];
-            as_bitstream(stream, rand_bit());
+            as_bitstream(stream, random_u32());
             puts(stream);
             return EXIT_SUCCESS;
         }
         if(streq(argv[1], "--label") || streq(argv[1], "-l")){
             ARG_ERR(EXIT_TOO_FEW_ARGS)
         }
-        break;
 
     // if only 2 args (excluding argv[0]) passed. Example: ./randbit --label incorrect
     case 3:
@@ -187,7 +198,7 @@ int main(int argc, char **argv){
         {
             ARG_ERR(EXIT_TOO_MUCH_ARGS)
         }
-        puts(rand_bit() ? argv[4] : argv[3]);
+        puts(rand_bit() ? argv[3] : argv[2]);
         return EXIT_SUCCESS;
     
     // if more than 3 args (excluding argv[0]) passed. Example: ./randbit --label incorrect correct ...
