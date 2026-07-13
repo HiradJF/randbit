@@ -40,7 +40,7 @@ heads
 
 make
 make BUILD=debug
-make TARGET_IS_WINDOWS=y
+make TARGET\_IS\_WINDOWS=y
 
 ## License
 
