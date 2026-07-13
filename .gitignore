@@ -5,3 +5,6 @@ main
 *.exe
 randbit
 build/
+.vscode
+.obsidian
+

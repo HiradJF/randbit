@@ -1,3 +1,5 @@
+#define VERSION "1.0.2"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -87,9 +89,7 @@ static inline void print_help(const char *program_exec) {
 }
 
 static inline void print_version(){
-    puts(
-        "Randbit Version 1.0"
-    );
+    puts("randbit " VERSION);
 }
 
 void as_bitstream(char buf[static 33], uint32_t num){

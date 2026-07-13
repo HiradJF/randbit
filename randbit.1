@@ -1,0 +1,54 @@
+NAME
+    randbit - generate cryptographically secure random bits
+
+SYNOPSIS
+    randbit [OPTIONS]
+
+DESCRIPTION
+    randbit generates cryptographically secure random values using the
+    operating system's random number generator.
+
+OPTIONS
+    -b, --bool
+        Print "true" or "false".
+
+    -c, --coin
+        Print "Heads" or "Tails".
+
+    -i, --int
+        Print a random unsigned 32-bit integer.
+
+    -l, --label
+        Prefix output with a label.
+
+    --version
+        Show version information.
+
+    --help
+        Show help.
+
+EXIT STATUS
+    0  Success.
+    1  Too many arguments.
+    2  Too few arguments.
+    3  Invalid arguments.
+    4  Random number generation failed.
+
+EXAMPLES
+    randbit
+
+    randbit --coin
+
+    randbit --int
+
+FILES
+    None.
+
+AUTHOR
+    Your Name
+
+LICENSE
+    MIT
+
+SEE ALSO
+    random(4), getrandom(2)
