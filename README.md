@@ -11,12 +11,16 @@ A small cross-platform command-line utility for generating cryptographically sec
 
 ## Installation
 
+```bash
 make
 sudo make install
+```
 
 ## Uninstallation
 
+```bash
 sudo make uninstall
+```
 
 ## Usage
 
@@ -38,9 +42,29 @@ heads
 
 ## Building
 
+```bash
 make
 make BUILD=debug
 make TARGET\_IS\_WINDOWS=y
+```
+
+## Also visit
+on unix-like systems:
+
+```bash
+man randbit #if installed
+```
+or
+```bash
+cat randbit.1
+```
+
+on windows:
+open randbit.txt #(or randbit.1 if you cloned the repo)
+
+on github:
+open randbit.1
+
 
 ## License
 
