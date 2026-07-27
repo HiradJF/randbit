@@ -1,4 +1,4 @@
-VERSION := $(shell awk '$$1 == "#define" $$2 == "VERSION" { print $$3 }' main.c)
+VERSION := $(shell awk '$$1 == "#define" && $$2 == "VERSION" { gsub(/"/, "", $$3); print $$3 }' main.c)
 PROJECT = randbit
 
 TARGET_IS_WINDOWS ?= n
@@ -109,6 +109,10 @@ dist:
 	mkdir -p -- $(WINDOWS_DISTDIR) $(LINUX_DISTDIR)
 	
 	@# ======= debug messages
+	
+	@printf "%b%s%b\n" $(STYLE_DBG)\
+	   	"VERSION=$(VERSION)" $(ANSI_RESET)
+	
 	@printf "%b%s%b\n" $(STYLE_DBG)\
 	   	"DISTDIR=$(DISTDIR)" $(ANSI_RESET)
 	
