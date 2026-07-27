@@ -1,4 +1,4 @@
-VERSION = 1.0.4
+VERSION = 1.0.5
 PROJECT = randbit
 
 TARGET_IS_WINDOWS ?= n
@@ -20,6 +20,7 @@ BUILD ?= release
 LDFLAGS ?=
 OUTDIR_BASE ?= build
 PROJ_BASE_DIR = $(shell pwd)
+
 
 
 #==============STYLING==============#
@@ -74,7 +75,7 @@ $(TARGET): $(SOURCES)
 	   	$(STYLE_DBG) "TARGET_IS_WINDOWS=$(TARGET_IS_WINDOWS)" $(ANSI_RESET)
 	@printf "%b%s%b\n" $(STYLE_DBG) "CC=$(CC)"  $(ANSI_RESET)
 	mkdir -p -- $(OUTDIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(CPPFLAGS)
 
 clean:
 	rm -rf $(OUTDIR_BASE) 

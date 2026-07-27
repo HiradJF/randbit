@@ -1,4 +1,6 @@
-#define VERSION "1.0.3"
+#ifndef VERSION
+#define VERSION "1.0.5"
+#endif 
 
 #include <stdio.h>
 #include <stdint.h>
@@ -20,14 +22,53 @@ static inline bool streq(const char *a, const char *b){
 }
 
 
+//          RNG Backends            //
+#define RNG_BACKEND_BCRYPT 0 
+#define RNG_BACKEND_GETRANDOM 1
+#define RNG_BACKEND_ARC4RANDOM 2
+#define RNG_BACKEND_URANDOM 3
+//                                  //
 
-#ifdef __linux__
+#ifndef RNG_BACKEND
+
+#ifdef _WIN32
+#define RNG_BACKEND RNG_BACKEND_BCRYPT
+
+
+#elif defined(__linux__) 
+#define RNG_BACKEND RNG_BACKEND_GETRANDOM
+
+#elif defined(__APPLE__) || defined(__OpenBSD__) || defined(__FreeBSD__)\
+    || defined(__NetBSD__) || defined(__DragonFly__)
+#define RNG_BACKEND RNG_BACKEND_ARC4RANDOM
+
+#elif defined(__unix__)
+#define RNG_BACKEND RNG_BACKEND_URANDOM 
+
+#else
+#error "Invalid backend (RNG_BACKEND)."
+
+#endif 
+#endif // #ifndef RNG_BACKEND
+
+#if RNG_BACKEND == RNG_BACKEND_BCRYPT
+
+#include <windows.h>
+#include <bcrypt.h>
+static inline uint32_t random_u32(){
+    uint32_t rand_int;
+    BCryptGenRandom(NULL, (PUCHAR)&rand_int, sizeof rand_int, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    return rand_int; 
+}
+
+
+#elif RNG_BACKEND == RNG_BACKEND_GETRANDOM
 #include <sys/random.h>
 
 static inline uint32_t random_u32(){
     uint32_t rand_int;
 
-    if (getrandom((void*)&rand_int, sizeof(rand_int), 0) != sizeof(rand_int)){
+    if (getrandom((void*)&rand_int, sizeof rand_int, 0) != sizeof rand_int){
         perror("randbit: getrandom");
         fputs("randbit: random number generation failed.", stderr);
         exit(EXIT_GEN_ERR);
@@ -35,27 +76,65 @@ static inline uint32_t random_u32(){
     return rand_int;
 }
 
-#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+
+#elif RNG_BACKEND == RNG_BACKEND_ARC4RANDOM
 #include <stdlib.h>
 
 static inline uint32_t random_u32(){
     uint32_t rand_int;
-    arc4random_buf(&rand_int, sizeof(rand_int));
+    arc4random_buf(&rand_int, sizeof rand_int);
     return rand_int;
 }
 
-#elif defined(_WIN32)
-#include <windows.h>
-#include <bcrypt.h>
-static inline uint32_t random_u32(){
-    uint32_t rand_int;
-    BCryptGenRandom(NULL, (PUCHAR)&rand_int, sizeof(rand_int), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-    return rand_int; 
-}
+#elif RNG_BACKEND == RNG_BACKEND_URANDOM
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <fcntl.h>
+#include <unistd.h>
+
+#ifndef URANDOM_LOCATION
+#define URANDOM_LOCATION "/dev/urandom"
 #endif
 
 
-static inline bool rand_bit(){
+
+static inline uint32_t random_u32(void)
+{
+    int fd = open(URANDOM_LOCATION, O_RDONLY);
+    if(fd == -1){
+        perror("randbit: open");
+        fputs( 
+                "randbit: random number generation failed "
+                "(couldn't open file \"" URANDOM_LOCATION "\").\n",
+                stderr
+        );
+        exit(EXIT_GEN_ERR);
+    }
+
+    uint32_t rand_int;
+
+    
+    ssize_t n = read(fd, &rand_int, sizeof rand_int);
+    if(n != sizeof rand_int)
+    {
+        perror("randbit: read");
+        fputs(
+                "randbit: random number generation failed \n" 
+                "(couldn't read enough bytes from \"" URANDOM_LOCATION "\").\n",
+                stderr
+        );
+        fprintf(stderr, "bytes read: %zd\n", n);
+        exit(EXIT_GEN_ERR);
+    }
+
+    return rand_int;
+}
+
+#endif
+
+
+static inline bool rand_bit(void){
     return random_u32() & 1;
 }
 
