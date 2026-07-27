@@ -1,4 +1,4 @@
-VERSION = 1.0.5
+VERSION := $(shell awk '$$1 == "#define" $$2 == "VERSION" { print $$3 }' main.c)
 PROJECT = randbit
 
 TARGET_IS_WINDOWS ?= n

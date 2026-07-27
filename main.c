@@ -209,7 +209,7 @@ int main(int argc, char **argv){
     case 1: 
         putchar('0' + rand_bit());
         putchar('\n');
-        return EXIT_SUCCESS;
+        break;
 
     // if only 1 arg (excluding argv[0]) passed. Example: ./randbit --help
     case 2:
@@ -217,46 +217,48 @@ int main(int argc, char **argv){
         {
             ARG_ERR(EXIT_INVALID_ARGS)
         }
-        if (streq(argv[1], "--help") || streq(argv[1], "-h"))
+        else if (streq(argv[1], "--help") || streq(argv[1], "-h"))
         {
             print_help(argv[0]);
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--version") || streq(argv[1], "-v"))
+        else if (streq(argv[1], "--version") || streq(argv[1], "-v"))
         {
             print_version();
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--bool") || streq(argv[1], "-b"))
+        else if (streq(argv[1], "--bool") || streq(argv[1], "-b"))
         {
             puts(rand_bit() ? "true" : "false");
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--coin") || streq(argv[1], "-c"))
+        else if (streq(argv[1], "--coin") || streq(argv[1], "-c"))
         {
             puts(rand_bit() ? "heads" : "tails");
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--int") || streq(argv[1], "-i"))
+        else if (streq(argv[1], "--int") || streq(argv[1], "-i"))
         {
             printf("%d\n", random_u32());
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--uint") || streq(argv[1], "-u"))
+        else if (streq(argv[1], "--uint") || streq(argv[1], "-u"))
         {
             printf("%u\n", random_u32());
             return EXIT_SUCCESS;
         }
-        if (streq(argv[1], "--bitstream") || streq(argv[1], "-s"))
+        else if (streq(argv[1], "--bitstream") || streq(argv[1], "-s"))
         {
             char stream[33];
             as_bitstream(stream, random_u32());
             puts(stream);
             return EXIT_SUCCESS;
         }
-        if(streq(argv[1], "--label") || streq(argv[1], "-l")){
+        else if(streq(argv[1], "--label") || streq(argv[1], "-l")){
             ARG_ERR(EXIT_TOO_FEW_ARGS)
         }
+
+        break;
 
     // if only 2 args (excluding argv[0]) passed. Example: ./randbit --label incorrect
     case 3:
@@ -272,6 +274,8 @@ int main(int argc, char **argv){
         else{
             ARG_ERR(EXIT_INVALID_ARGS)
         }
+
+        [[fallthrough]]; /* fallthrough logically impossible, silencing warning */
         
     // if only 3 args (excluding argv[0]) passed. Example: ./randbit --label incorrect correct
     case 4:
@@ -283,7 +287,7 @@ int main(int argc, char **argv){
             ARG_ERR(EXIT_TOO_MUCH_ARGS)
         }
         puts(rand_bit() ? argv[3] : argv[2]);
-        return EXIT_SUCCESS;
+        break;
     
     // if more than 3 args (excluding argv[0]) passed. Example: ./randbit --label incorrect correct ...
     // this option is invalid by default
@@ -296,6 +300,8 @@ int main(int argc, char **argv){
         }
         fprintf(stderr, "Invalid mode: \"%s\"", argv[1]);
         print_help(argv[0]);
-        return EXIT_INVALID_ARGS;
+        break;
     }
+
+    return EXIT_SUCCESS;
 }
