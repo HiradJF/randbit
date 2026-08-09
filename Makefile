@@ -1,4 +1,4 @@
-VERSION := $(shell awk '$$1 == "#define" && $$2 == "VERSION" { gsub(/"/, "", $$3); print $$3 }' main.c)
+VERSION := $(shell cat VERSION)
 PROJECT = randbit
 
 TARGET_IS_WINDOWS ?= n
@@ -16,6 +16,7 @@ endif
 STD ?= c23
 SOURCES := main.c
 CFLAGS_COMMON := -std=$(STD) -Wall -Wextra -Wpedantic
+CPPFLAGS += -DVERSION=\"$(VERSION)\"
 BUILD ?= release
 LDFLAGS ?=
 OUTDIR_BASE ?= build
@@ -75,7 +76,7 @@ $(TARGET): $(SOURCES)
 	   	$(STYLE_DBG) "TARGET_IS_WINDOWS=$(TARGET_IS_WINDOWS)" $(ANSI_RESET)
 	@printf "%b%s%b\n" $(STYLE_DBG) "CC=$(CC)"  $(ANSI_RESET)
 	mkdir -p -- $(OUTDIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(CPPFLAGS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm -rf $(OUTDIR_BASE) 
@@ -86,9 +87,8 @@ MANDIR := $(PREFIX)/share/man
 LICENSEDIR := $(PREFIX)/share/licenses/randbit
 
 install: $(TARGET)
-	install -Dm755 $(TARGET) $(DESTDIR)$(BINDIR)/$(EXEC_NAME)
-	install -Dm644 randbit.1 $(DESTDIR)$(MANDIR)/man1/randbit.1
-	install -Dm644 LICENSE $(DESTDIR)$(LICENSEDIR)/LICENSE
+	PREFIX="$(PREFIX)" BINDIR="$(BINDIR)" MANDIR="$(MANDIR)" DESTDIR="$(DESTDIR)"\
+	LICENSEDIR="$(LICENSEDIR)" TARGET=$(TARGET) EXEC_NAME="$(EXEC_NAME)" ./install.sh
 
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/$(EXEC_NAME)
@@ -144,7 +144,7 @@ dist:
 	
 	@# ======== Linux
 	@printf "%b%s%b\n" $(STYLE_HEADING) "Staging (Linux)..." $(ANSI_RESET)
-	cp LICENSE README.md randbit.1 $(TARGET) $(LINUX_DISTDIR)/
+	cp LICENSE README.md randbit.1 install.sh $(TARGET) $(LINUX_DISTDIR)/
 	@echo "%b%s%b\n" $(STYLE_SUCCESS) "Finished staging (linux)" $(ANSI_RESET)
 	
 	@# ======= Windows
@@ -183,6 +183,3 @@ cleanall:
 	$(MAKE) clean
 	$(MAKE) cleandist
 
-
-ansitest:
-	@printf "%btest\n" $(ANSI_RED)
