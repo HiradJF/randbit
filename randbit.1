@@ -1,54 +1,77 @@
 NAME
-    randbit - generate cryptographically secure random bits
+randbit ‐ generate cryptographically secure random bits
 
 SYNOPSIS
-    randbit [OPTIONS]
+randbit [MODE] [ARGS...]
 
 DESCRIPTION
-    randbit generates cryptographically secure random values using the
-    operating system's random number generator.
+randbit generates cryptographically secure random values using
+the operating system's random number generator.
 
-OPTIONS
-    -b, --bool
-        Print "true" or "false".
+MODES
+No mode
+Output a random bit (0 or 1).
 
-    -c, --coin
-        Print "Heads" or "Tails".
+```
+-b, --bool
+    Output "true" or "false".
 
-    -i, --int
-        Print a random unsigned 32-bit integer.
+-c, --coin
+    Output "Heads" or "Tails".
 
-    -l, --label
-        Prefix output with a label.
+-i, --int
+    Output a random signed 32-bit integer.
 
-    --version
-        Show version information.
+-u, --uint
+    Output a random unsigned 32-bit integer.
 
-    --help
-        Show help.
+-s, --bitstream
+    Output a random 32-bit value as a bit stream.
+
+-l, --label [0] [1]
+    Output one of the two supplied labels, corresponding to
+    random bit values 0 and 1.
+
+-v, --version
+    Show version information.
+
+-h, --help
+    Show help.
+```
 
 EXIT STATUS
-    0  Success.
-    1  Too many arguments.
-    2  Too few arguments.
-    3  Invalid arguments.
-    4  Random number generation failed.
+0   Success.
+1   Too many arguments.
+2   Too few arguments.
+3   Invalid arguments.
+4   Random number generation failed.
 
 EXAMPLES
-    randbit
+randbit
 
-    randbit --coin
+```
+randbit --bool
 
-    randbit --int
+randbit --coin
+
+randbit --int
+
+randbit --uint
+
+randbit --bitstream
+
+randbit --label SHA-256 SHA-3-256
+```
 
 FILES
-    None.
+None.
 
 AUTHOR
-    Your Name
+Hirad Jahangirfard (@HiradJF)
 
 LICENSE
-    MIT
+MIT
 
 SEE ALSO
-    random(4), getrandom(2)
+random(4), getrandom(2)
+
